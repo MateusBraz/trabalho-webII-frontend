@@ -5,8 +5,19 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import './plugins/axios'
+import VueMask from 'v-mask'
+
+Vue.use(VueMask)
 
 Vue.config.productionTip = false
+
+Vue.filter('currency', value => {
+    return 'R$' + value.toLocaleString()
+})
+
+Vue.filter('data', value => {
+    return 'R$' + value.toLocaleString()
+})
 
 new Vue({
     router,
