@@ -41,13 +41,13 @@
         <v-dialog
           ref="dialog"
           v-model="modal"
-          :return-value.sync="date"
+          :return-value.sync="pessoaDataNascimento"
           persistent
           width="290px"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              v-model="date"
+              v-model="pessoaDataNascimento"
               label="Data nascimento"
               prepend-icon="mdi-calendar"
               color="#16db93"
@@ -56,10 +56,19 @@
               v-on="on"
             ></v-text-field>
           </template>
-          <v-date-picker color="#144552" v-model="date" scrollable>
+          <v-date-picker
+            color="#144552"
+            :max="dataMaxPermitida"
+            v-model="pessoaDataNascimento"
+            scrollable
+          >
             <v-spacer></v-spacer>
             <v-btn text color="#FB8C00" @click="modal = false"> Fechar </v-btn>
-            <v-btn text color="#16db93" @click="$refs.dialog.save(date)">
+            <v-btn
+              text
+              color="#16db93"
+              @click="$refs.dialog.save(pessoaDataNascimento)"
+            >
               OK
             </v-btn>
           </v-date-picker>
@@ -79,6 +88,26 @@
           background-color="white"
         ></v-text-field> -->
       </v-col>
+
+      <!-- ref="pessoaSituacao" -->
+      <v-col
+        v-if="pessoaTipo === 'FISICA' && menorIdade"
+        cols="12"
+        sm="6"
+        md="6"
+        lg="6"
+      >
+        <v-select
+          ref="responsavelSelecionado"
+          :rules="[() => !!responsavelSelecionado || 'Campo Obrigatório!']"
+          color="#16db93"
+          :items="pessoas"
+          v-model="responsavelSelecionado"
+          label="Selecione um responsável"
+          outlined
+        ></v-select>
+      </v-col>
+
       <v-col v-if="pessoaTipo === 'FISICA'" cols="12" sm="6" md="6" lg="6">
         <v-text-field
           ref="pessoaRg"
@@ -159,18 +188,26 @@
 <script>
 export default {
   created() {
-    // console.log(new Date(2020, 11, 29));
-    // console.log(new Date());
-    const data1 = new Date();
-    const data2 = new Date(1996, 3, 9);
-    const diferenca = Math.abs(data1.getTime() - data2.getTime());
-    console.log("aaaaaaaaa" + diferenca);
+    this.$http
+      .get(
+        `/pessoa/buscarTodos`,
+        {
+          headers: {
+            login: this.$store.user.login,
+            senha: this.$store.user.senha,
+          },
+        }
+      )
+      .then((response) => {
+        this.pessoas = response.data.map(pessoa => `${pessoa.id}/${pessoa.nome}`);
+      })
+      .catch((error) => {
+        alert(error.response.data.message);
+      });
   },
   data: () => ({
     modal: false,
-    date: new Date().toISOString().substr(0, 10),
-    // date: new Date().toISOString().substr(0, 10),
-    // dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
+    responsavelSelecionado: null,
     pessoaResposta: {},
     menu1: false,
     mostrar: false,
@@ -181,9 +218,19 @@ export default {
     pessoaCpf: null,
     pessoaCnpj: null,
     pessoaSituacao: null,
-    pessoaDataNascimento: null,
     itemsTipo: ["FISICA", "JURIDICA"],
     itemsSituacao: ["ATIVO", "INATIVO"],
+    pessoas: [],
+    dataMaxPermitida: new Date(
+      new Date().valueOf() - new Date().getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .substr(0, 10),
+    pessoaDataNascimento: new Date(
+      new Date().valueOf() - new Date().getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .substr(0, 10),
   }),
   computed: {
     form() {
@@ -192,7 +239,6 @@ export default {
           pessoaTipo: this.pessoaTipo,
           pessoaNome: this.pessoaNome,
           pessoaApelido: this.pessoaApelido,
-          pessoaDataNascimento: this.pessoaDataNascimento,
           pessoaSituacao: this.pessoaSituacao,
         };
       }
@@ -203,27 +249,23 @@ export default {
             pessoaApelido: this.pessoaApelido,
             pessoaRg: this.pessoaRg,
             pessoaCpf: this.pessoaCpf,
-            pessoaDataNascimento: this.pessoaDataNascimento,
             pessoaSituacao: this.pessoaSituacao,
+            responsavelSelecionado: this.responsavelSelecionado,
           }
         : {
             pessoaTipo: this.pessoaTipo,
             pessoaNome: this.pessoaNome,
             pessoaApelido: this.pessoaApelido,
             pessoaCnpj: this.pessoaCnpj,
-            pessoaDataNascimento: this.pessoaDataNascimento,
             pessoaSituacao: this.pessoaSituacao,
           };
     },
-    // menorIdade() {
-    //   if (this.pessoaDataNascimento.length == 10) {
-    //     const date = new Date();
-    //   }
-    // },
-  },
-  watch: {
-    date() {
-      this.dateFormatted = this.formatDate(this.date);
+    menorIdade() {
+      const idade = this.getIdade(this.pessoaDataNascimento);
+      if (idade < 18) {
+        return true;
+      }
+      return false;
     },
   },
   methods: {
@@ -246,24 +288,52 @@ export default {
         // this.resetarFormulario();
       }
     },
-    formatDateYYYYmmDD(date) {
-      const d = new Date(date);
-      let month = `${d.getMonth() + 1}`;
-      let day = `${d.getDate()}`;
-      const year = d.getFullYear();
-
-      if (month.length < 2) month = `0${month}`;
-      if (day.length < 2) day = `0${day}`;
-
-      return [year, month, day].join("-");
+    convertDateMMDDYYY(datearray) {
+      return datearray[2] + "-" + datearray[1] + "-" + datearray[0];
     },
-    // formatDate(date) {
-    //   if (!date) return null;
+    getIdade(data) {
+      var hoje = new Date(
+        new Date().valueOf() - new Date().getTimezoneOffset() * 60000
+      );
 
-    //   const [year, month, day] = date.split("-");
+      var nascimento = new Date(this.convertDateMMDDYYY(data.split("/")));
+      //Retorna a diferença entre hoje e a data de nascimento em anos.
+      var ano = hoje.getFullYear() - nascimento.getFullYear();
+
+      //Retorna a diferença de mês do mês de nascimento para o atual.
+      var m = hoje.getMonth() - nascimento.getMonth();
+
+      //Caso ainda não tenha ultrapassado o dia e o mês
+      if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+        ano--;
+      }
+      return ano;
+    },
+    // formatDateYYYYmmDD(pessoaDataNascimento) {
+    //   const d = new Date(pessoaDataNascimento);
+    //   let month = `${d.getMonth() + 1}`;
+    //   let day = `${d.getDate()}`;
+    //   const year = d.getFullYear();
+
+    //   if (month.length < 2) month = `0${month}`;
+    //   if (day.length < 2) day = `0${day}`;
+    //   return [year, month, day].join("-");
+    // },
+    // formatDate(pessoaDataNascimento) {
+    //   if (!pessoaDataNascimento) return null;
+
+    //   const [year, month, day] = pessoaDataNascimento.split("-");
     //   return `${day}/${month}/${year}`;
     // },
   },
+  // watch: {
+  // pessoaDataNascimento() {
+  //   this.dateFormatted = this.formatDate(this.pessoaDataNascimento);
+  // },
+  // pessoaDataNascimento(newValue, oldValue) {
+  //     console.log(`>>>>>>>>>>>>>>>>${newValue} ${oldValue}`);
+  // },
+  // },
 };
 </script>
 

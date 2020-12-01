@@ -8,7 +8,13 @@
           </v-list-item-title>
         </v-list-item>
 
-        <v-list-group v-for="item in itens" :key="item.texto" color="#16db93" no-action sub-group>
+        <v-list-group
+          v-for="item in itens"
+          :key="item.texto"
+          color="#16db93"
+          no-action
+          sub-group
+        >
           <template v-slot:activator>
             <v-list-item-content>
               <v-list-item-title>
@@ -21,7 +27,7 @@
           <v-list-item
             v-for="(opcao, i) in item.opcoes"
             :key="i"
-            style="text-decoration:none; color:white;"
+            style="text-decoration: none; color: white"
             :to="opcao.link"
             link
           >
@@ -39,22 +45,41 @@
 
     <v-app-bar app clipped-left color="#144552" dark dense>
       <v-app-bar-nav-icon @click.stop="gaveta = !gaveta"></v-app-bar-nav-icon>
-      <v-toolbar-title class="mr-12 align-center animate__animated animate__backInRight">
-        <router-link style="text-decoration: none; color: white;" to="/">System</router-link>
+      <v-toolbar-title
+        class="mr-12 align-center animate__animated animate__backInRight"
+      >
+        <router-link style="text-decoration: none; color: white" to="/"
+          >System</router-link
+        >
       </v-toolbar-title>
       <v-spacer></v-spacer>
 
       <v-btn class="d-none d-md-flex" icon>
-        <v-icon>mdi-facebook</v-icon>
+        <a
+          href="https://www.facebook.com/mateus.braz.104/"
+          target="_blank"
+          style="text-decoration: none"
+          ><v-icon color="white">mdi-facebook</v-icon></a
+        >
       </v-btn>
       <v-btn class="d-none d-md-flex" icon>
-        <v-icon>mdi-instagram</v-icon>
+        <a
+          href="https://www.instagram.com/_mateusbraz/?hl=pt-br"
+          target="_blank"
+          style="text-decoration: none"
+          ><v-icon color="white">mdi-instagram</v-icon></a
+        >
       </v-btn>
       <v-btn class="d-none d-md-flex mr-7" icon>
-        <v-icon>mdi-linkedin</v-icon>
+        <a
+          href="https://www.linkedin.com/in/mateus-braz-348b1116a/"
+          target="_blank"
+          style="text-decoration: none"
+          ><v-icon color="white">mdi-linkedin</v-icon></a
+        >
       </v-btn>
 
-      <div style="color : #16db93" color="#144552" class="d-none d-sm-flex mr-2">
+      <div style="color: #16db93" color="#144552" class="d-none d-sm-flex mr-2">
         <v-icon color="#16db93">mdi-account-circle-outline</v-icon>
         {{ this.$store.user.login }}
       </div>

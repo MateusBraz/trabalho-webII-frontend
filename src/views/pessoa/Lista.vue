@@ -104,10 +104,13 @@
                     </v-col>
                     <v-col cols="12">
                       <v-select
+                        ref="pessoaSituacao"
+                        v-model="pessoaSituacao"
                         color="#16db93"
                         :items="itemsSituacao"
-                        ref="situacao"
-                        v-model="pessoaSituacao"
+                        :rules="[
+                          () => !!pessoaSituacao || 'Campo Obrigatório!',
+                        ]"
                         label="Situacao"
                         outlined
                       ></v-select>
@@ -216,6 +219,7 @@ export default {
         pessoaCpf: this.pessoaCpf,
         pessoaCnpj: this.pessoaCnpj,
         pessoaDataNascimento: this.pessoaDataNascimento,
+        pessoaSituacao: this.pessoaSituacao,
       };
     },
   },
