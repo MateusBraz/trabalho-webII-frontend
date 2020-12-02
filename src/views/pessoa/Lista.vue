@@ -1,5 +1,11 @@
 <template>
   <div>
+    <Alert
+      :alert="alert"
+      @fecharAlert="alert = $event"
+      :text="textAlert"
+      :color="color"
+    />
     <v-data-table
       style="color: #144552"
       :headers="headers"
@@ -8,17 +14,25 @@
       class="elevation-1"
     >
       <template v-slot:item.actions="{ item }">
-        <v-icon color="#16db93" small class="mr-2" @click="editarUsuario(item)"
+        <v-icon color="#16db93" small class="mr-2" @click="editarPessoa(item)"
           >mdi-pencil</v-icon
         >
-        <v-icon color="#16db93" small @click="deletarUsuario(item)"
+        <v-icon color="#16db93" small @click="deletarPessoa(item)"
           >mdi-delete</v-icon
         >
       </template>
     </v-data-table>
 
     <v-row justify="center">
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <DialogDelete
+        :dialogDelete="dialogDelete"
+        opcaoDelete="PESSOA"
+        :idElemento="idPessoa"
+        @dialogDeleteAberto="dialogDelete = $event"
+        @delete="operacaoDelete($event)"
+      />
+
+      <v-dialog v-model="dialogFormAtualizacoes" persistent max-width="600px">
         <v-card>
           <v-card-title>
             <!-- <span class="headline">Usuário</span> -->
@@ -148,35 +162,33 @@
 </template>
 
 <script>
+import DialogDelete from "@/components/DialogDelete.vue";
+import Alert from "@/components/Alert.vue";
 export default {
+  components: {
+    DialogDelete,
+    Alert,
+  },
   created() {
-    this.$http
-      .get(
-        `/pessoa?idResponsavel=${this.params.idResponsavel}&nomeResponsavel=${this.params.nomeResponsavel}&tipo=${this.params.tipo}&situacao=${this.params.situacao}`,
-        {
-          headers: {
-            login: this.$store.user.login,
-            senha: this.$store.user.senha,
-          },
-        }
-      )
-      .then((response) => {
-        this.pessoas = response.data;
-      })
-      .catch((error) => {
-        alert(error.response.data.message);
-      });
+    this.buscarTodos();
   },
   data() {
     return {
+      dialogDelete: false,
+
+      color: "",
+      alert: false,
+      textAlert: "Excluído com sucesso",
+
       params: {
         idResponsavel: 1,
         nomeResponsavel: "",
         tipo: "",
         situacao: "",
       },
+
       pessoaResposta: {},
-      idPessoa: null,
+      idPessoa: 0,
       mostrar: false,
       pessoaNome: null,
       pessoaApelido: null,
@@ -187,7 +199,7 @@ export default {
       pessoaDataNascimento: null,
 
       formularioPossuiErros: false,
-      dialog: false,
+      dialogFormAtualizacoes: false,
       itemsSituacao: ["ATIVO", "INATIVO"],
       headers: [
         // {
@@ -224,7 +236,7 @@ export default {
     },
   },
   methods: {
-    editarUsuario(pessoa) {
+    editarPessoa(pessoa) {
       console.log(pessoa.id);
       this.idPessoa = pessoa.id;
       this.pessoaNome = pessoa.nome;
@@ -234,11 +246,23 @@ export default {
       this.pessoaCpf = pessoa.cpf;
       this.pessoaCnpj = pessoa.cnpj;
       this.pessoaSituacao = pessoa.situacao;
-      this.dialog = true;
+      this.dialogFormAtualizacoes = true;
     },
-    deletarUsuario(pessoa) {
-      this.dialog = true;
-      console.log(pessoa);
+    deletarPessoa(pessoa) {
+      this.idPessoa = pessoa.id;
+      this.dialogDelete = true;
+    },
+    operacaoDelete(resposta) {
+      if (resposta.sucesso) {
+        this.color = "#16db93";
+        this.textAlert = "Excluído com sucesso";
+        this.alert = true;
+        this.buscarTodos();
+      } else {
+        this.color = "#FF9100";
+        this.textAlert = resposta.messagem;
+        this.alert = true;
+      }
     },
     submeter() {
       this.formularioPossuiErros = false;
@@ -276,7 +300,7 @@ export default {
         )
         .then((response) => {
           this.pessoaResposta = response.data;
-          this.dialog = false;
+          this.dialogFormAtualizacoes = false;
           alert("Alterado com sucesso");
         })
         .catch((error) => {
@@ -290,8 +314,26 @@ export default {
       });
     },
     fecharDialog() {
-      this.dialog = false;
+      this.dialogFormAtualizacoes = false;
       this.resetarFormulario();
+    },
+    buscarTodos() {
+      this.$http
+        .get(
+          `/pessoa?idResponsavel=${this.params.idResponsavel}&nomeResponsavel=${this.params.nomeResponsavel}&tipo=${this.params.tipo}&situacao=${this.params.situacao}`,
+          {
+            headers: {
+              login: this.$store.user.login,
+              senha: this.$store.user.senha,
+            },
+          }
+        )
+        .then((response) => {
+          this.pessoas = response.data;
+        })
+        .catch((error) => {
+          alert(error.response.data.message);
+        });
     },
   },
 };
