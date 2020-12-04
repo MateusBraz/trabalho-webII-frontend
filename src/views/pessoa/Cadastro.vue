@@ -1,6 +1,11 @@
 <template>
   <v-row>
-    <Alert :alert="alert" @fecharAlert="alert = $event" :text="textAlert" :color="color" />
+    <Alert
+      :alert="alert"
+      @fecharAlert="alert = $event"
+      :text="textAlert"
+      :color="color"
+    />
     <v-card
       ref="form"
       @keydown.enter="submeter"
@@ -197,10 +202,10 @@
 </template>
 
 <script>
-import Alert from '@/components/Alert.vue';
+import Alert from "@/components/Alert.vue";
 export default {
   components: {
-    Alert
+    Alert,
   },
   created() {
     this.$http
@@ -220,9 +225,9 @@ export default {
       });
   },
   data: () => ({
-    color: '',
+    color: "",
     alert: false,
-    textAlert: '',
+    textAlert: "",
     modal: false,
     responsavelSelecionado: null,
     pessoaResposta: {},
@@ -362,13 +367,13 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.color = '#16db93'
+          this.resetarFormulario();
+          this.color = "#16db93";
           this.textAlert = "Cadastrado com sucesso";
           this.alert = true;
-          this.resetarFormulario();
         })
         .catch((error) => {
-          this.color = '#FF9100'
+          this.color = "#FF9100";
           this.textAlert = error.response.data.message;
           this.alert = true;
         });
