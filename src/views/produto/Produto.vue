@@ -13,14 +13,19 @@
             >
           </strong>
           <v-spacer></v-spacer>
-          <v-icon color="#16db93" small class="mr-2" @click="editarPessoa(item)"
+          <v-icon
+            color="#16db93"
+            small
+            class="mr-2"
+            @click="editarProduto(produto)"
             >mdi-pencil</v-icon
           >
-          <v-icon color="#16db93" small @click="deletarPessoa(item)"
+          <v-icon color="#16db93" small @click="deletarProduto(produto)"
             >mdi-delete</v-icon
           >
         </v-row>
         <v-row class="pa-2" style="font-size: 1rem">
+          <v-spacer></v-spacer>
           <p class="mr-2">Quatidade estoque:</p>
           <strong style="color: #16db93">
             {{ produto.quantidadeEstoque }}
@@ -57,7 +62,12 @@
 
 <script>
 export default {
-  props: ["produto"],
+  props: {
+    produto: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       quantity: 0,
@@ -66,6 +76,12 @@ export default {
   methods: {
     addQuantity() {
       this.quantity++;
+    },
+    editarProduto(produto) {
+      this.$emit("produtoSelecionado", produto);
+    },
+    deletarProduto(produto) {
+      this.$emit("deletarProduto", produto);
     },
   },
 };

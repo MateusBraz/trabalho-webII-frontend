@@ -36,7 +36,10 @@ export default {
       this.$emit("dialogDeleteAberto", false);
     },
     excluir() {
-      if (this.opcaoDelete === "PESSOA") {
+      if (this.opcaoDelete === "USUARIO") {
+        alert("usuário excluído");
+        this.$emit("dialogDeleteAberto", false);
+      } else if (this.opcaoDelete === "PESSOA") {
         this.$http
           .delete(`/pessoa/${this.idElemento}`, {
             headers: {
@@ -48,7 +51,7 @@ export default {
             console.log(response.data);
             this.$emit("delete", {
               sucesso: true,
-              mensagem: ""
+              mensagem: "",
             });
           })
           .catch((error) => {
@@ -59,8 +62,28 @@ export default {
           });
 
         this.$emit("dialogDeleteAberto", false);
-      } else if (this.opcaoDelete === "USUARIO") {
-        alert("usuário excluído");
+      } else {
+        this.$http
+          .delete(`/produto/${this.idElemento}`, {
+            headers: {
+              login: this.$store.user.login,
+              senha: this.$store.user.senha,
+            },
+          })
+          .then((response) => {
+            console.log(response.data);
+            this.$emit("delete", {
+              sucesso: true,
+              mensagem: "",
+            });
+          })
+          .catch((error) => {
+            this.$emit("delete", {
+              sucesso: false,
+              mensagem: error.response.data.message,
+            });
+          });
+
         this.$emit("dialogDeleteAberto", false);
       }
     },

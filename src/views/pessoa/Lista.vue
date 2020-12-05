@@ -45,6 +45,7 @@
                   @keydown.enter="submeter"
                   width="100%"
                   class="white--text"
+                  elevation="0"
                 >
                   <!-- color="#144552" -->
                   <v-row class="pa-4">
