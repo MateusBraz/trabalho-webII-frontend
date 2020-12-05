@@ -5,18 +5,27 @@
       class="white--text"
     >
       <v-card-title class="headline">
-        <strong>
-          {{ produto.descricao }}
-          <small style="color: #16db93"
-            >(Preço: {{ produto.precoVenda | currency }})</small
+        <v-row class="pa-2">
+          <strong>
+            {{ produto.descricao }}
+            <small style="color: #16db93"
+              >(Preço: {{ produto.precoVenda | currency }})</small
+            >
+          </strong>
+          <v-spacer></v-spacer>
+          <v-icon color="#16db93" small class="mr-2" @click="editarPessoa(item)"
+            >mdi-pencil</v-icon
           >
-        </strong>
-      </v-card-title>
-      <v-card-title>
-        Quatidade estoque:
-        <strong style="color: #16db93">
-          {{ produto.quantidadeEstoque }}
-        </strong>
+          <v-icon color="#16db93" small @click="deletarPessoa(item)"
+            >mdi-delete</v-icon
+          >
+        </v-row>
+        <v-row class="pa-2" style="font-size: 1rem">
+          <p class="mr-2">Quatidade estoque:</p>
+          <strong style="color: #16db93">
+            {{ produto.quantidadeEstoque }}
+          </strong>
+        </v-row>
       </v-card-title>
     </v-card>
     <v-card>

@@ -58,15 +58,17 @@
             width="290px"
           >
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="pessoaDataNascimento"
-                label="Data nascimento"
-                prepend-icon="mdi-calendar"
-                color="#16db93"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
+              <div class="input-data">
+                <v-text-field
+                  v-model="pessoaDataNascimento"
+                  label="Data nascimento"
+                  prepend-icon="mdi-calendar"
+                  color="#16db93"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </div>
             </template>
             <v-date-picker
               color="#144552"
@@ -381,3 +383,13 @@ export default {
   },
 };
 </script>
+
+<style>
+.input-data {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #9e9e9e;
+  border-radius: 4px 4px 4px 4px;
+  height: 56px;
+}
+</style>
