@@ -1,5 +1,12 @@
 <template>
   <div>
+    <Alert
+      :alert="alert"
+      @fecharAlert="alert = $event"
+      :text="textAlert"
+      :color="color"
+    />
+
     <v-data-table
       style="color: #144552"
       :headers="headers"
@@ -64,35 +71,28 @@
                     label="Administrador"
                     outlined
                   ></v-select>
-
-                  <v-col align="center">
-                    <div>
-                      <v-slide-x-reverse-transition>
-                        <v-tooltip left>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                              icon
-                              class="my-0"
-                              v-bind="attrs"
-                              @click="resetarFormulario"
-                              v-on="on"
-                            >
-                              <div>
-                                <v-icon color="#16db93">mdi-refresh</v-icon>
-                              </div>
-                            </v-btn>
-                          </template>
-                          <span>Resetar Formulário</span>
-                        </v-tooltip>
-                      </v-slide-x-reverse-transition>
-                    </div>
-                  </v-col>
                 </v-card>
               </v-row>
             </v-container>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
+            <v-tooltip left>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  class="my-0"
+                  v-bind="attrs"
+                  @click="resetarFormulario"
+                  v-on="on"
+                >
+                  <div>
+                    <v-icon color="#16db93">mdi-refresh</v-icon>
+                  </div>
+                </v-btn>
+              </template>
+              <span>Resetar Formulário</span>
+            </v-tooltip>
             <v-btn color="#FB8C00" text @click="fecharDialog">Fechar</v-btn>
             <v-btn color="#16db93" text @click="submeter">Atualizar</v-btn>
           </v-card-actions>
@@ -103,24 +103,20 @@
 </template>
 
 <script>
+import Alert from "@/components/Alert.vue";
 export default {
+  components: {
+    Alert,
+  },
   created() {
-    this.$http
-      .get("/usuario", {
-        headers: {
-          login: this.$store.user.login,
-          senha: this.$store.user.senha,
-        },
-      })
-      .then((response) => {
-        this.usuarios = response.data;
-      })
-      .catch((error) => {
-        alert(error.response.data.message);
-      });
+    this.buscarTodos();
   },
   data() {
     return {
+      color: "",
+      alert: false,
+      textAlert: "",
+
       usuarioResposta: {},
       idUsuario: null,
       isAdministrador: null,
@@ -177,7 +173,6 @@ export default {
       });
       if (this.formularioPossuiErros == false) {
         this.atualizar();
-        this.resetarFormulario();
       }
     },
     atualizar() {
@@ -198,9 +193,30 @@ export default {
           }
         )
         .then((response) => {
+          this.resetarFormulario();
+          this.buscarTodos();
           this.usuarioResposta = response.data;
           this.dialog = false;
-          alert("Alterado com sucesso");
+          this.color = "#16db93";
+          this.textAlert = "Alterado com sucesso";
+          this.alert = true;
+        })
+        .catch((error) => {
+          this.color = "#FF9100";
+          this.textAlert = error.response.data.message;
+          this.alert = true;
+        });
+    },
+    buscarTodos() {
+      this.$http
+        .get("/usuario", {
+          headers: {
+            login: this.$store.user.login,
+            senha: this.$store.user.senha,
+          },
+        })
+        .then((response) => {
+          this.usuarios = response.data;
         })
         .catch((error) => {
           alert(error.response.data.message);

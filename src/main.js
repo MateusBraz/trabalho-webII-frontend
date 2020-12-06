@@ -27,6 +27,11 @@ new Vue({
         if (userString) {
             const userData = JSON.parse(userString)
             this.$store.user = userData
+            const pedidoString = localStorage.getItem('pedido')
+            if (pedidoString) {
+                const pedidoData = JSON.parse(pedidoString)
+                this.$store.pedido = Array.from(pedidoData)
+            }
         }
         this.$http.interceptors.response.use(
             response => response,
