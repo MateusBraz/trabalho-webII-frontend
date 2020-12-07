@@ -88,7 +88,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-main justify="center" align="center">
+    <v-main style="background-color: #263238" justify="center" align="center">
       <v-container>
         <transition name="slide" mode="out-in">
           <router-view class="ma-1"></router-view>

@@ -2,7 +2,10 @@
   <v-row justify="center">
     <v-dialog v-model="alert" max-width="600">
       <v-card color="#144552">
-        <v-card-title :style="{ color: color }" class="headline">
+        <v-card-title
+          :style="{ color: color, 'word-break': 'normal' }"
+          class="headline"
+        >
           {{ text }}
           <!-- <h1 @click="fechar" class="botao-fechar">X</h1> -->
         </v-card-title>

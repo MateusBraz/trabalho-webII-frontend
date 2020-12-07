@@ -8,9 +8,12 @@
     />
 
     <v-card
+      dark
+      style="background-color: #144552"
       ref="form"
       @keydown.enter="submeter"
       width="100%"
+      color="#144552"
       class="white--text"
     >
       <v-row class="pa-4">
@@ -22,7 +25,6 @@
             outlined
             label="Descrição"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
 
@@ -35,7 +37,6 @@
             outlined
             label="Idade permitida"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
 
@@ -49,7 +50,6 @@
             outlined
             label="Preço compra"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
 
@@ -64,7 +64,6 @@
             outlined
             label="Preço venda pessoa física"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
 
@@ -79,7 +78,6 @@
             outlined
             label="Preço venda pessoa jurídica"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
 
@@ -92,7 +90,6 @@
             outlined
             label="Quantidade estoque"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
       </v-row>

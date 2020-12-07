@@ -1,7 +1,11 @@
 <template>
-  <v-row align="center" justify="center" style="background-color: #ccc5b9">
-    <transition enter-active-class="animate__animated animate__backInDown" appear>
+  <v-row align="center" justify="center" style="background-color: #263238">
+    <transition
+      enter-active-class="animate__animated animate__backInDown"
+      appear
+    >
       <v-card
+        dark
         ref="form"
         @keydown.enter="submeter"
         elevation="20"
@@ -13,7 +17,7 @@
         </div>
         <v-card-text class="mt-3">
           <div class="d-flex">
-            <div style="width: 85%;" class="d-flex align-center justify-center">
+            <div style="width: 85%" class="d-flex align-center justify-center">
               <v-text-field
                 ref="usuario"
                 v-model.lazy.trim="usuario"
@@ -21,18 +25,17 @@
                 outlined
                 label="Usuário"
                 color="#16db93"
-                background-color="white"
               ></v-text-field>
             </div>
             <div
-              style="height: 56px; width: 15%;"
+              style="height: 56px; width: 15%"
               class="d-flex align-center justify-center div-icon"
             >
               <v-icon color="#16db93">fas fa-user</v-icon>
             </div>
           </div>
           <div class="d-flex">
-            <div style="width: 85%;" class="d-flex align-center justify-center">
+            <div style="width: 85%" class="d-flex align-center justify-center">
               <v-text-field
                 ref="senha"
                 v-model.lazy.trim="senha"
@@ -42,12 +45,11 @@
                 outlined
                 label="Senha"
                 color="#16db93"
-                background-color="white"
                 @click:append="mostrar = !mostrar"
               ></v-text-field>
             </div>
             <div
-              style="height: 56px; width: 15%;"
+              style="height: 56px; width: 15%"
               class="d-flex align-center justify-center div-icon"
             >
               <v-icon color="#16db93">fas fa-lock</v-icon>
@@ -61,7 +63,13 @@
               <v-slide-x-reverse-transition>
                 <v-tooltip left>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon class="my-0" v-bind="attrs" @click="resetarFormulario" v-on="on">
+                    <v-btn
+                      icon
+                      class="my-0"
+                      v-bind="attrs"
+                      @click="resetarFormulario"
+                      v-on="on"
+                    >
                       <div>
                         <v-icon color="#16db93">mdi-refresh</v-icon>
                       </div>
@@ -79,12 +87,12 @@
 </template>
 
 <script>
-import store from '@/store'
+import store from "@/store";
 export default {
   data: () => {
     return {
-      usuario: '',
-      senha: '',
+      usuario: "",
+      senha: "",
       mostrar: false,
       formularioPossuiErros: false,
     };
@@ -120,12 +128,12 @@ export default {
           },
         })
         .then((response) => {
-          store.user = response.data
-          localStorage.setItem('user', JSON.stringify(response.data))
-          this.$router.push("/")
+          store.user = response.data;
+          localStorage.setItem("user", JSON.stringify(response.data));
+          this.$router.push("/");
         })
         .catch((error) => {
-          alert(error.response.data.message)
+          alert(error.response.data.message);
         });
     },
     resetarFormulario() {

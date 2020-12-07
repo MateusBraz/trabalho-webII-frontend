@@ -7,12 +7,71 @@
       :color="color"
     />
 
+    <v-card
+      dark
+      style="background-color: #144552"
+      ref="formFiltro"
+      width="100%"
+      elevation="0"
+      color="#144552"
+      class="white--text mb-2 mr-1 pa-2"
+    >
+      <v-row class="pa-0">
+        <v-col cols="6" sm="4" md="4" lg="4">
+          <v-text-field
+            ref="precoMinimo"
+            v-model.lazy.trim="precoMinimo"
+            :rules="[
+              () => !!precoMinimo || 'Campo Obrigatório, e apenas números!',
+            ]"
+            outlined
+            label="Preço mínimo"
+            color="#16db93"
+          ></v-text-field>
+        </v-col>
+
+        <v-col cols="6" sm="4" md="4" lg="4">
+          <v-text-field
+            ref="precoMaximo"
+            v-model.lazy.trim="precoMaximo"
+            :rules="[
+              () => !!precoMaximo || 'Campo Obrigatório, e apenas números!',
+            ]"
+            outlined
+            label="Preço máximo"
+            color="#16db93"
+          ></v-text-field>
+        </v-col>
+
+        <v-col cols="12" sm="4" md="4" lg="4" class="d-flex align-center">
+          <v-tooltip left>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                class="my-0"
+                v-bind="attrs"
+                @click="resetarFormularioFiltro"
+                v-on="on"
+              >
+                <div>
+                  <v-icon color="#16db93">mdi-refresh</v-icon>
+                </div>
+              </v-btn>
+            </template>
+            <span>Resetar campos de filtro</span>
+          </v-tooltip>
+          <v-btn color="#16db93" text @click="submeterFiltro">filtrar</v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
+
     <Produto
       v-for="produto in produtos"
       :key="produto.id"
       :produto="produto"
       @produtoSelecionado="editarProduto($event)"
       @deletarProduto="deletarProduto($event)"
+      @produtoAdicionado="produtoAdicionadoNoPedido"
     />
 
     <DialogDelete
@@ -24,11 +83,12 @@
     />
 
     <v-dialog v-model="dialogFormAtualizacoes" persistent max-width="600px">
-      <v-card>
+      <v-card dark style="background-color: #144552">
         <v-card-text>
           <v-container>
             <v-row>
               <v-card
+                style="background-color: #144552"
                 ref="form"
                 @keydown.enter="submeter"
                 width="100%"
@@ -44,7 +104,6 @@
                       outlined
                       label="Descrição"
                       color="#16db93"
-                      background-color="white"
                     ></v-text-field>
                   </v-col>
 
@@ -57,7 +116,6 @@
                       outlined
                       label="Idade permitida"
                       color="#16db93"
-                      background-color="white"
                     ></v-text-field>
                   </v-col>
 
@@ -73,7 +131,6 @@
                       outlined
                       label="Preço compra"
                       color="#16db93"
-                      background-color="white"
                     ></v-text-field>
                   </v-col>
 
@@ -89,7 +146,6 @@
                       outlined
                       label="Preço venda pessoa física"
                       color="#16db93"
-                      background-color="white"
                     ></v-text-field>
                   </v-col>
 
@@ -105,7 +161,6 @@
                       outlined
                       label="Preço venda pessoa jurídica"
                       color="#16db93"
-                      background-color="white"
                     ></v-text-field>
                   </v-col>
 
@@ -120,7 +175,6 @@
                       outlined
                       label="Quantidade estoque"
                       color="#16db93"
-                      background-color="white"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -175,12 +229,11 @@ export default {
       alert: false,
       textAlert: "",
 
+      formularioFiltroPossuiErros: false,
       dialogFormAtualizacoes: false,
-      params: {
-        descricao: "",
-        precoMinimo: 2,
-        precoMaximo: 2,
-      },
+
+      precoMinimo: null,
+      precoMaximo: null,
 
       dialogDelete: false,
 
@@ -205,6 +258,12 @@ export default {
     precoVendaJuridica() {
       this.precoVendaJuridica = this.mascaraReal(`${this.precoVendaJuridica}`);
     },
+    precoMinimo() {
+      this.precoMinimo = this.mascaraReal(`${this.precoMinimo}`);
+    },
+    precoMaximo() {
+      this.precoMaximo = this.mascaraReal(`${this.precoMaximo}`);
+    },
   },
   computed: {
     form() {
@@ -217,12 +276,35 @@ export default {
         quantidadeEstoque: this.quantidadeEstoque,
       };
     },
+    formFiltro() {
+      return {
+        precoMinimo: this.precoMinimo,
+        precoMaximo: this.precoMaximo,
+      };
+    },
   },
   methods: {
     buscarTodos() {
       this.$http
+        .get(`/produto/buscarTodos`, {
+          headers: {
+            login: this.$store.user.login,
+            senha: this.$store.user.senha,
+          },
+        })
+        .then((response) => {
+          this.produtos = response.data;
+        })
+        .catch((error) => {
+          alert(error.response.data.message);
+        });
+    },
+    buscarProdutos() {
+      this.$http
         .get(
-          `/produto?descricao=${this.params.descricao}&precoMinimo=${this.params.precoMinimo}&precoMaximo=${this.params.precoMaximo}`,
+          `/produto?precoMinimo=${this.getRemoveMascaraReal(
+            this.precoMinimo
+          )}&precoMaximo=${this.getRemoveMascaraReal(this.precoMaximo)}`,
           {
             headers: {
               login: this.$store.user.login,
@@ -281,6 +363,24 @@ export default {
         this.atualizarProduto();
       }
     },
+    resetarFormularioFiltro() {
+      this.formularioFiltroPossuiErros = false;
+      Object.keys(this.formFiltro).forEach((f) => {
+        this.$refs[f].reset();
+      });
+    },
+    submeterFiltro() {
+      this.formularioFiltroPossuiErros = false;
+      Object.keys(this.formFiltro).forEach((f) => {
+        if (!this.formFiltro[f]) {
+          this.formularioFiltroPossuiErros = true;
+          this.$refs[f].validate(true);
+        }
+      });
+      if (this.formularioFiltroPossuiErros == false) {
+        this.buscarProdutos();
+      }
+    },
     atualizarProduto() {
       this.$http
         .put(
@@ -315,6 +415,11 @@ export default {
           this.textAlert = error.response.data.message;
           this.alert = true;
         });
+    },
+    produtoAdicionadoNoPedido(produtoAdicionadoResposta) {
+      this.textAlert = produtoAdicionadoResposta.textAlert;
+      this.color = produtoAdicionadoResposta.color;
+      this.alert = true;
     },
     fecharDialog() {
       // this.resetarFormulario();

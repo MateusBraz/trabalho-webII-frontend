@@ -7,8 +7,11 @@
       :color="color"
     />
     <v-card
+      dark
+      style="background-color: #144552"
       ref="form"
       @keydown.enter="submeter"
+      color="#144552"
       width="100%"
       class="white--text"
     >
@@ -21,7 +24,6 @@
             color="#16db93"
             :items="itemsTipo"
             v-model="pessoaTipo"
-            background-color="white"
             label="Tipo"
             outlined
           ></v-select>
@@ -35,7 +37,6 @@
             outlined
             label="Nome"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="6" md="6" lg="6">
@@ -46,7 +47,6 @@
             outlined
             label="Apelido"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="6" md="6" lg="6">
@@ -71,6 +71,8 @@
               </div>
             </template>
             <v-date-picker
+              dark
+              style="background-color: #144552"
               color="#144552"
               :max="dataMaxPermitida"
               v-model="pessoaDataNascimento"
@@ -89,23 +91,8 @@
               </v-btn>
             </v-date-picker>
           </v-dialog>
-          <!-- <v-text-field
-          ref="pessoaDataNascimento"
-          v-model.lazy.trim="pessoaDataNascimento"
-          v-mask="'##/##/####'"
-          :rules="[
-            () =>
-              (!!pessoaDataNascimento && pessoaDataNascimento.length >= 10) ||
-              'Campo Obrigatório!',
-          ]"
-          outlined
-          label="Data Nascimento"
-          color="#16db93"
-          background-color="white"
-        ></v-text-field> -->
         </v-col>
 
-        <!-- ref="pessoaSituacao" -->
         <v-col
           v-if="pessoaTipo === 'FISICA' && menorIdade"
           cols="12"
@@ -133,7 +120,6 @@
             outlined
             label="RG"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
         <v-col v-if="pessoaTipo === 'FISICA'" cols="12" sm="6" md="6" lg="6">
@@ -148,7 +134,6 @@
             outlined
             label="CPF"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
         <v-col v-if="pessoaTipo === 'JURIDICA'" cols="12" sm="6" md="6" lg="6">
@@ -164,7 +149,6 @@
             outlined
             label="CNPJ"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="6" md="6" lg="6">
@@ -386,6 +370,7 @@ export default {
 
 <style>
 .input-data {
+  padding-top: 6px;
   border-style: solid;
   border-width: 1px;
   border-color: #9e9e9e;

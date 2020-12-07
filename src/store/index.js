@@ -1,50 +1,64 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import barramento from '@/barramento'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
         user: {},
-        pedido: [],
-        isProdutoQuantidadeMax: false
     },
     mutations: {
         adicionarProdutoPedido(state, novoItemPedido) {
-            const listItemPedidoExistente = state.pedido.filter(itemPedido => {
-                return `${itemPedido.idProduto}` === `${novoItemPedido.itemPedido.idProduto}`;
-            });
+            var pedido = [];
+            if (JSON.parse(localStorage.getItem("pedido")) != null) {
+                pedido = JSON.parse(localStorage.getItem("pedido"));
+                const listItemPedidoExistente = pedido.filter(itemPedido => {
+                    return itemPedido.idProduto === novoItemPedido.itemPedido.idProduto;
+                });
 
-            if (listItemPedidoExistente.length > 0) {
-                console.log("Possui produtos")
-                const itemPedidoExistente = listItemPedidoExistente[0];
-                const qtdProduto = itemPedidoExistente.quantidade + novoItemPedido.itemPedido.quantidade;
-                if (qtdProduto > novoItemPedido.qtdProdutoMax) {
-                    state.isProdutoQuantidadeMax = false;
-                    return
-                }
-                state.pedido.forEach(itemPedido => {
-                    if (`${itemPedido.idProduto}` === `${novoItemPedido.itemPedido.idProduto}`) {
-                        itemPedido.quantidade = qtdProduto;
+                if (listItemPedidoExistente.length > 0) {
+                    const itemPedidoExistente = listItemPedidoExistente[0];
+                    const qtdProduto = itemPedidoExistente.quantidade + novoItemPedido.itemPedido.quantidade;
+                    if (qtdProduto > novoItemPedido.qtdProdutoMax) {
+                        barramento.setIsProdutoAdicionado(false);
+                    } else {
+                        pedido.forEach(itemPedido => {
+                                if (itemPedido.idProduto === novoItemPedido.itemPedido.idProduto) {
+                                    itemPedido.quantidade = qtdProduto;
+                                }
+                            })
+                            // state.pedido.push(novoItemPedido.itemPedido);
+                        localStorage.setItem('pedido', JSON.stringify(pedido));
+                        barramento.setIsProdutoAdicionado(true);
                     }
-                })
-                // state.pedido.push(novoItemPedido.itemPedido);
-                localStorage.setItem('pedido', JSON.stringify(state.pedido));
-                state.isProdutoQuantidadeMax = true;
-                return
+                } else {
+                    pedido.push(novoItemPedido.itemPedido);
+                    localStorage.setItem('pedido', JSON.stringify(pedido));
+                    barramento.setIsProdutoAdicionado(true);
+                }
+            } else {
+                pedido.push(novoItemPedido.itemPedido);
+                localStorage.setItem('pedido', JSON.stringify(pedido));
+                barramento.setIsProdutoAdicionado(true);
             }
-            console.log("Não possui produtos")
-            console.log(state.pedido);
-            state.pedido.push(novoItemPedido.itemPedido)
-            localStorage.setItem('pedido', JSON.stringify(state.pedido))
-            state.isProdutoQuantidadeMax = true;
         },
+        deletarItemPedido(state, itemPedido) {
+            var pedido = JSON.parse(localStorage.getItem("pedido"));
+            const index = pedido.findIndex(item => item.idProduto === itemPedido.idProduto);
+            pedido.splice(index, 1);
+            localStorage.setItem('pedido', JSON.stringify(pedido));
+        }
     },
 
     actions: {
         adicionarProdutoPedido({ commit }, novoItemPedido) {
-            return commit('adicionarProdutoPedido', novoItemPedido)
+            commit('adicionarProdutoPedido', novoItemPedido)
+        },
+        deletarItemPedido({ commit }, itemPedido) {
+            commit('deletarItemPedido', itemPedido)
         }
     },
+
     modules: {}
 })

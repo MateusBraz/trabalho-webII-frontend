@@ -8,7 +8,8 @@
     />
 
     <v-data-table
-      style="color: #144552"
+      dark
+      style="background-color: #144552"
       :headers="headers"
       :items="usuarios"
       :items-per-page="5"
@@ -26,7 +27,7 @@
 
     <v-row justify="center">
       <v-dialog v-model="dialog" persistent max-width="600px">
-        <v-card>
+        <v-card dark style="background-color: #144552">
           <v-card-title>
             <!-- <span class="headline">Usuário</span> -->
           </v-card-title>
@@ -34,6 +35,7 @@
             <v-container>
               <v-row>
                 <v-card
+                  style="background-color: #144552"
                   ref="form"
                   @keydown.enter="submeter"
                   elevation="0"
@@ -47,7 +49,6 @@
                     outlined
                     label="Novo Login"
                     color="#16db93"
-                    background-color="white"
                   ></v-text-field>
 
                   <v-text-field
@@ -59,7 +60,6 @@
                     outlined
                     label="Nova senha"
                     color="#16db93"
-                    background-color="white"
                     @click:append="mostrar = !mostrar"
                   ></v-text-field>
 

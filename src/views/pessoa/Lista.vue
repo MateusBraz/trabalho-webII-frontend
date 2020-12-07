@@ -6,8 +6,66 @@
       :text="textAlert"
       :color="color"
     />
+
+    <v-card
+      dark
+      style="background-color: #144552"
+      ref="formFiltro"
+      width="100%"
+      elevation="0"
+      color="#144552"
+      class="white--text mb-2 mr-1 pa-2"
+    >
+      <v-row class="pa-0">
+        <v-col cols="6" sm="4" md="4" lg="4">
+          <v-select
+            ref="tipoFiltro"
+            color="#16db93"
+            :rules="[() => !!tipoFiltro || 'Campo Obrigatório!']"
+            :items="itemsTipo"
+            v-model="tipoFiltro"
+            label="Situacao"
+            outlined
+          ></v-select>
+        </v-col>
+
+        <v-col cols="6" sm="4" md="4" lg="4">
+          <v-select
+            ref="situacaoFiltro"
+            :rules="[() => !!situacaoFiltro || 'Campo Obrigatório!']"
+            color="#16db93"
+            :items="itemsSituacao"
+            v-model="situacaoFiltro"
+            label="Situacao"
+            outlined
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" sm="4" md="4" lg="4" class="d-flex align-center">
+          <v-tooltip left>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                class="my-0"
+                v-bind="attrs"
+                @click="resetarFormularioFiltro"
+                v-on="on"
+              >
+                <div>
+                  <v-icon color="#16db93">mdi-refresh</v-icon>
+                </div>
+              </v-btn>
+            </template>
+            <span>Resetar campos de filtro</span>
+          </v-tooltip>
+          <v-btn color="#16db93" text @click="submeterFiltro">filtrar</v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
+
     <v-data-table
-      style="color: #144552"
+      dark
+      style="background-color: #144552"
       :headers="headers"
       :items="pessoas"
       :items-per-page="5"
@@ -33,7 +91,7 @@
       />
 
       <v-dialog v-model="dialogFormAtualizacoes" persistent max-width="600px">
-        <v-card>
+        <v-card dark style="background-color: #144552">
           <v-card-title>
             <!-- <span class="headline">Usuário</span> -->
           </v-card-title>
@@ -41,10 +99,10 @@
             <v-container>
               <v-row>
                 <v-card
+                  style="background-color: #144552"
                   ref="form"
                   @keydown.enter="submeter"
                   width="100%"
-                  class="white--text"
                   elevation="0"
                 >
                   <!-- color="#144552" -->
@@ -57,7 +115,6 @@
                         outlined
                         label="Nome"
                         color="#16db93"
-                        background-color="white"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6" lg="6">
@@ -68,7 +125,6 @@
                         outlined
                         label="Apelido"
                         color="#16db93"
-                        background-color="white"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6" lg="6">
@@ -94,6 +150,8 @@
                           </div>
                         </template>
                         <v-date-picker
+                          dark
+                          style="background-color: #144552"
                           color="#144552"
                           :max="dataMaxPermitida"
                           v-model="pessoaDataNascimento"
@@ -151,7 +209,6 @@
                         outlined
                         label="RG"
                         color="#16db93"
-                        background-color="white"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -173,7 +230,6 @@
                         outlined
                         label="CPF"
                         color="#16db93"
-                        background-color="white"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -195,7 +251,6 @@
                         outlined
                         label="CNPJ"
                         color="#16db93"
-                        background-color="white"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6" lg="6">
@@ -228,7 +283,7 @@
                   v-on="on"
                 >
                   <div>
-                    <v-icon color="#144552">mdi-refresh</v-icon>
+                    <v-icon color="#16db93">mdi-refresh</v-icon>
                   </div>
                 </v-btn>
               </template>
@@ -269,12 +324,9 @@ export default {
       alert: false,
       textAlert: "",
 
-      params: {
-        idResponsavel: 1,
-        nomeResponsavel: "",
-        tipo: "",
-        situacao: "",
-      },
+      tipoFiltro: null,
+      situacaoFiltro: null,
+
       responsavelSelecionado: null,
       menorIdade: false,
       pessoaTipo: null,
@@ -292,6 +344,7 @@ export default {
       formularioPossuiErros: false,
       dialogFormAtualizacoes: false,
       itemsSituacao: ["ATIVO", "INATIVO"],
+      itemsTipo: ["FISICA", "JURIDICA"],
       headers: [
         // {
         //   text: "ID",
@@ -349,6 +402,12 @@ export default {
         pessoaSituacao: this.pessoaSituacao,
       };
     },
+    formFiltro() {
+      return {
+        tipoFiltro: this.tipoFiltro,
+        situacaoFiltro: this.situacaoFiltro,
+      };
+    },
   },
   methods: {
     editarPessoa(pessoa) {
@@ -381,6 +440,24 @@ export default {
         this.color = "#FF9100";
         this.textAlert = resposta.messagem;
         this.alert = true;
+      }
+    },
+    resetarFormularioFiltro() {
+      this.formularioFiltroPossuiErros = false;
+      Object.keys(this.formFiltro).forEach((f) => {
+        this.$refs[f].reset();
+      });
+    },
+    submeterFiltro() {
+      this.formularioFiltroPossuiErros = false;
+      Object.keys(this.formFiltro).forEach((f) => {
+        if (!this.formFiltro[f]) {
+          this.formularioFiltroPossuiErros = true;
+          this.$refs[f].validate(true);
+        }
+      });
+      if (this.formularioFiltroPossuiErros == false) {
+        this.buscarPessoas();
       }
     },
     submeter() {
@@ -444,8 +521,43 @@ export default {
     },
     buscarTodos() {
       this.$http
+        .get(`/pessoa/buscarTodos`, {
+          headers: {
+            login: this.$store.user.login,
+            senha: this.$store.user.senha,
+          },
+        })
+        .then((response) => {
+          this.pessoas = response.data;
+          this.opcoesResponsaveis = this.pessoas.map(
+            (pessoa) => `${pessoa.id}/${pessoa.nome}`
+          );
+        })
+        .catch((error) => {
+          alert(error.response.data.message);
+        });
+    },
+    buscarTodosOpcoesResponsaveis() {
+      this.$http
+        .get(`/pessoa/buscarTodos`, {
+          headers: {
+            login: this.$store.user.login,
+            senha: this.$store.user.senha,
+          },
+        })
+        .then((response) => {
+          this.opcoesResponsaveis = response.data.map(
+            (pessoa) => `${pessoa.id}/${pessoa.nome}`
+          );
+        })
+        .catch((error) => {
+          alert(error.response.data.message);
+        });
+    },
+    buscarPessoas() {
+      this.$http
         .get(
-          `/pessoa?idResponsavel=${this.params.idResponsavel}&nomeResponsavel=${this.params.nomeResponsavel}&tipo=${this.params.tipo}&situacao=${this.params.situacao}`,
+          `/pessoa?tipo=${this.tipoFiltro}&situacao=${this.situacaoFiltro}`,
           {
             headers: {
               login: this.$store.user.login,
@@ -455,9 +567,7 @@ export default {
         )
         .then((response) => {
           this.pessoas = response.data;
-          this.opcoesResponsaveis = this.pessoas.map(
-            (pessoa) => `${pessoa.id}/${pessoa.nome}`
-          );
+          this.buscarTodosOpcoesResponsaveis();
         })
         .catch((error) => {
           alert(error.response.data.message);
@@ -503,6 +613,8 @@ export default {
 
 <style>
 .input-data {
+  background-color: #144552;
+  padding-top: 6px;
   border-style: solid;
   border-width: 1px;
   border-color: #9e9e9e;

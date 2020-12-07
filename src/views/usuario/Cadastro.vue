@@ -8,9 +8,12 @@
     />
 
     <v-card
+      dark
+      style="background-color: #144552"
       ref="form"
       @keydown.enter="submeter"
       width="100%"
+      color="#144552"
       class="white--text"
     >
       <v-row class="pa-4">
@@ -22,7 +25,6 @@
             outlined
             label="Login"
             color="#16db93"
-            background-color="white"
           ></v-text-field>
         </v-col>
 
@@ -36,7 +38,6 @@
             outlined
             label="Senha"
             color="#16db93"
-            background-color="white"
             @click:append="mostrar = !mostrar"
           ></v-text-field>
         </v-col>
