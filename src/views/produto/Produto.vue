@@ -35,6 +35,7 @@
       <div style="height: 150px">
         <v-container fill-height>
           <v-text-field
+            dark
             v-if="produto.quantidadeEstoque > 0"
             label="Quantidade"
             type="number"
@@ -44,6 +45,7 @@
           ></v-text-field>
           <h1 v-else class="mr-8">Esgotado!</h1>
           <v-btn
+            dark
             class="ml-1"
             :disabled="
               produto.quantidadeEstoque == 0 ||

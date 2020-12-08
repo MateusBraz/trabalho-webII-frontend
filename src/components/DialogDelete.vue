@@ -2,8 +2,8 @@
   <v-row justify="center">
     <v-dialog v-model="dialogDelete" persistent max-width="400">
       <v-card color="#144552">
-        <v-card-title style="color: #fff" class="headline">
-          Tem certeza que deseja excluir?
+        <v-card-title style="color: #fff; word-break: normal" class="headline">
+          {{ text }}
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -29,6 +29,13 @@ export default {
     idElemento: {
       type: Number,
       required: true,
+    },
+  },
+  computed: {
+    text() {
+      return `${this.opcaoDelete}` == "PEDIDO"
+        ? "Tem certeza que deseja cancelar este pedido?"
+        : "Tem certeza que deseja excluir?";
     },
   },
   methods: {
@@ -62,7 +69,7 @@ export default {
           });
 
         this.$emit("dialogDeleteAberto", false);
-      } else {
+      } else if (this.opcaoDelete === "PRODUTO") {
         this.$http
           .delete(`/produto/${this.idElemento}`, {
             headers: {
@@ -81,6 +88,29 @@ export default {
             this.$emit("delete", {
               sucesso: false,
               mensagem: error.response.data.message,
+            });
+          });
+
+        this.$emit("dialogDeleteAberto", false);
+      } else {
+        this.$http
+          .put(`/pedido/${this.idElemento}`, null, {
+            headers: {
+              login: this.$store.user.login,
+              senha: this.$store.user.senha,
+            },
+          })
+          .then((response) => {
+            console.log(response);
+            this.$emit("delete", {
+              sucesso: true,
+              mensagem: "",
+            });
+          })
+          .catch((error) => {
+            this.$emit("delete", {
+              sucesso: false,
+              mensagem: `${error.response.data.message}`,
             });
           });
 
